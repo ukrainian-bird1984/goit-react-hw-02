@@ -1,67 +1,65 @@
-import Description from "./components/Description/Description";
-import Options from "./components/Options/Options";
-import Feedback from "./components/Feedback/Feedback";
-import Notification from "./components/Notification/Notification";
+import { useEffect, useState } from 'react';
+import css from './App.module.css';
 
-import { useState, useEffect } from "react";
+import Description from './components/Description/Description';
+import Options from './components/Options/Options';
+import Feedback from './components/Feedback/Feedback';
+import Notification from './components/Notification/Notification';
 
-const App = () => {
-  const initialState = {
+function App() {
+  const feedbackInit = {
     good: 0,
     neutral: 0,
-    bad: 0
+    bad: 0,
   };
+  const [feedback, setFeedback] = useState(() => {
+    const feedbackLocalStorage = window.localStorage.getItem('feedback-status');
 
-  const [feedback, setFeedback] = useState(initialState);
-
-  useEffect(() => {
-    const storedFeedback = localStorage.getItem("feedback");
-    if (storedFeedback) {
-      setFeedback(JSON.parse(storedFeedback));
+    if (feedbackLocalStorage !== null) {
+      return JSON.parse(feedbackLocalStorage);
     }
-  }, []);
 
+    return feedbackInit;
+  });
   useEffect(() => {
-    localStorage.setItem("feedback", JSON.stringify(feedback));
+    window.localStorage.setItem('feedback-status', JSON.stringify(feedback));
   }, [feedback]);
 
+  const buttons = ['good', 'neutral', 'bad'];
   const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
-  const positiveFeedbackPercentage = Math.round(
-    (feedback.good / totalFeedback) * 100
-  );
+  const positiveFeedback = Math.round(((feedback.good + feedback.neutral) / totalFeedback) * 100);
 
-  const handleReset = () => {
-    localStorage.removeItem("feedback");
-    setFeedback(initialState);
-  };
+  function updateFeedback(event) {
+    const key = event.target.innerHTML;
+    setFeedback({ ...feedback, [key]: feedback[key] + 1 });
+  }
+  function resetFeedback() {
+    setFeedback(feedbackInit);
+  }
 
   return (
-    <div>
+    <div className={css.container}>
       <Description
         title="Sip Happens Café"
-        description="Please leave your feedback about our service by selecting one of the options below."
-      />
+        text="Please leave your feedback about our service by selecting one of the options below."
+      ></Description>
       <Options
-        updateFeedback={(type) =>
-          setFeedback({ ...feedback, [type]: feedback[type] + 1 })
-        }
+        updateFeedback={updateFeedback}
+        buttons={buttons}
         totalFeedback={totalFeedback}
-        handleReset={handleReset}
-      />
+        resetFeedback={resetFeedback}
+      ></Options>
       {totalFeedback > 0 ? (
-        <Feedback feedback={feedback} />
+        <Feedback
+          feedback={feedback}
+          totalFeedback={totalFeedback}
+          positiveFeedback={positiveFeedback}
+        ></Feedback>
       ) : (
-        <Notification message="No feedback yet." />
+        <Notification notificationText="Not feedback yet"></Notification>
       )}
-      <div>
-        <p>Total feedback: {totalFeedback}</p>
-        <p>
-          Positive feedback percentage:{" "}
-          {isNaN(positiveFeedbackPercentage) ? 0 : positiveFeedbackPercentage}%
-        </p>
-      </div>
     </div>
   );
-};
+}
 
 export default App;
