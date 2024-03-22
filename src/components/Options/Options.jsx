@@ -2,13 +2,17 @@ import React from 'react';
 import css from './Options.module.css';
 
 const Options = ({ buttons, updateFeedback, totalFeedback, resetFeedback }) => {
+  const handleFeedbackClick = (item) => {
+    updateFeedback(item);
+  };
+
   return (
     <>
       <ul className={css.list}>
         {buttons.map(item => {
           return (
             <li key={item}>
-              <button className={css.button} onClick={updateFeedback}>
+              <button className={css.button} onClick={() => handleFeedbackClick(item)}>
                 {item}
               </button>
             </li>

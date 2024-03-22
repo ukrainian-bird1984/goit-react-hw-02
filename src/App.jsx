@@ -29,10 +29,10 @@ function App() {
   const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
   const positiveFeedback = Math.round(((feedback.good + feedback.neutral) / totalFeedback) * 100);
 
-  function updateFeedback(event) {
-    const key = event.target.innerHTML;
-    setFeedback({ ...feedback, [key]: feedback[key] + 1 });
+  function updateFeedback(type) {
+    setFeedback({ ...feedback, [type]: feedback[type] + 1 });
   }
+
   function resetFeedback() {
     setFeedback(feedbackInit);
   }
